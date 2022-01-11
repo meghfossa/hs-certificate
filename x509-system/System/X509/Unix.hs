@@ -24,6 +24,7 @@ import qualified Control.Exception as E
 
 import Data.Maybe (catMaybes)
 import Data.Monoid (mconcat)
+import System.X509.Common (withEnvOverride)
 
 defaultSystemPaths :: [FilePath]
 defaultSystemPaths =
@@ -37,7 +38,7 @@ envPathOverride :: String
 envPathOverride = "SYSTEM_CERTIFICATE_PATH"
 
 getSystemCertificateStore :: IO CertificateStore
-getSystemCertificateStore = mconcat . catMaybes <$> (getSystemPaths >>= mapM readCertificateStore)
+getSystemCertificateStore = withEnvOverride $ mconcat . catMaybes <$> (getSystemPaths >>= mapM readCertificateStore)
 
 getSystemPaths :: IO [FilePath]
 getSystemPaths = E.catch ((:[]) <$> getEnv envPathOverride) inDefault
